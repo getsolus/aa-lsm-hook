@@ -13,7 +13,7 @@ If the cache is invalid or unable to load, it will be recompiled, to ensure that
 
 ## WORK IN PROGRESS
 
-This repo is currently work in progress. Gimme a few hours.
+This repo is currently work in progress. Check back later
 
 ## Authors
 
