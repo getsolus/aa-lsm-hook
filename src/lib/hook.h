@@ -9,7 +9,15 @@
  * (at your option) any later version.
  */
 
+#pragma once
+
+#define _GNU_SOURCE
+
 #include <stdbool.h>
+#include <stdint.h>
+
+/* Maximum number of source dirs we'll support. */
+#define MAX_SOURCE_DIRS 8
 
 /**
  * Our AaHookContext is used to track some basic state
@@ -17,6 +25,9 @@
 typedef struct AaHookContext {
         const char *parser_binary; /**< Path to the discovered parser */
         const char *cache_dir;     /**<Our cache directory (defined at build time) */
+
+        const char *source_dirs[MAX_SOURCE_DIRS]; /**<Currently known source directories */
+        uint8_t n_source_dirs;                    /**<Number of source dirs we have */
 } AaHookContext;
 
 /**

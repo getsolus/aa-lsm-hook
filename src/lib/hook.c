@@ -18,6 +18,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 /**
@@ -32,6 +33,15 @@ static const char *apparmor_binaries[] = {
         "/usr/sbin/apparmor_parser",
         "/bin/apparmor_parser",
         "/usr/bin/apparmor_parser",
+};
+
+/**
+ * For now we only support /etc/apparmor.d as a source directory.
+ * In future we intend to make this support stateless paths, pending work
+ * upstream.
+ */
+static const char *apparmor_directories[] = {
+        "/etc/apparmor.d",
 };
 
 bool aa_hook_context_init(AaHookContext *self)
@@ -53,6 +63,24 @@ bool aa_hook_context_init(AaHookContext *self)
         if (aa_unlikely(!self->parser_binary)) {
                 fputs("Unable to locate apparmor_parser\n", stderr);
                 return false;
+        }
+
+        /* Locate system apparmor directories */
+        for (size_t i = 0; i < ARRAY_SIZE(apparmor_directories); i++) {
+                const char *app_dir = apparmor_directories[i];
+                struct stat st = { 0 };
+
+                if (stat(app_dir, &st) != 0) {
+                        continue;
+                }
+
+                if (!S_ISDIR(st.st_mode)) {
+                        continue;
+                }
+
+                /* Got a dir */
+                self->source_dirs[self->n_source_dirs] = app_dir;
+                ++self->n_source_dirs;
         }
 
         /* Just taken from build time */
