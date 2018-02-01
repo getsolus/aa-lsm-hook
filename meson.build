@@ -49,6 +49,7 @@ cdata = configuration_data()
 cdata.set_quoted('PACKAGE_NAME', meson.project_name())
 cdata.set_quoted('PACKAGE_VERSION', meson.project_version())
 cdata.set_quoted('PACKAGE_URL', 'https://solus-project.com')
+cdata.set_quoted('AA_CACHE_DIR', path_vardir)
 
 # Allow building with static binaries
 with_static_binary = get_option('with-static-binary')

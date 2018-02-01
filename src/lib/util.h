@@ -9,25 +9,13 @@
  * (at your option) any later version.
  */
 
-#define _GNU_SOURCE
+#pragma once
 
-#include <stdio.h>
-#include <stdlib.h>
+#define __aa_unused__ __attribute__(unused))
 
-#include "hook.h"
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
-int main(int argc, char **argv)
-{
-        AaHookContext ctx = { 0 };
-
-        /* Perform discovery */
-        if (!aa_hook_context_init(&ctx)) {
-                return EXIT_FAILURE;
-        }
-
-        fputs("Not yet implemented\n", stderr);
-        return EXIT_FAILURE;
-}
+#define aa_unlikely(x) __builtin_expect((!!x), 0)
 
 /*
  * Editor modelines  -  https://www.wireshark.org/tools/modelines.html
