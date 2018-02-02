@@ -31,6 +31,7 @@ bool aa_hook_context_load_cache(AaHookContext *self)
         char *command[] = {
                 NULL,                    /* parser_binary path */
                 "-rB",                   /* Replace rules, read binary input */
+                "--abort-on-error",      /* We need error codes */
                 (char *)self->cache_dir, /* Target cache */
                 NULL,                    /* Terminator */
         };
