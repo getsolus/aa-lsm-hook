@@ -80,11 +80,11 @@ bool aa_hook_context_clean_cache(AaHookContext *self)
         ret = true;
 
         while ((ent = readdir(dir)) != NULL) {
-                if (strncmp(ent->d_name, ".", 1) == 0) {
+                if (strlen(ent->d_name) == 1 && strcmp(ent->d_name, ".") == 0) {
                         continue;
                 }
 
-                if (strncmp(ent->d_name, "..", 2) == 0) {
+                if (strlen(ent->d_name) == 2 && strcmp(ent->d_name, "..") == 0) {
                         continue;
                 }
 
