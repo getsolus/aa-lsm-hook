@@ -132,14 +132,14 @@ bool aa_hook_context_build_cache(AaHookContext *self)
                                 strerror(errno));
                         return false;
                 }
-        }
-
-        /* Just in case someone derps it. */
-        if (!S_ISDIR(st.st_mode)) {
-                fprintf(stderr,
-                        "Cache directory is not actually a directory %s\n",
-                        self->cache_dir);
-                return false;
+        } else {
+                /* Just in case someone derps it. */
+                if (!S_ISDIR(st.st_mode)) {
+                        fprintf(stderr,
+                                "Cache directory is not actually a directory %s\n",
+                                self->cache_dir);
+                        return false;
+                }
         }
 
         /* Attempt to build all source directories */
