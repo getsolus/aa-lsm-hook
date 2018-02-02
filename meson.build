@@ -69,6 +69,7 @@ config_h_dir = include_directories('.')
 # Build the project
 subdir('src')
 subdir('data')
+subdir('man')
 
 report = [
     '    Build configuration:',
