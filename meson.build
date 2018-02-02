@@ -41,6 +41,10 @@ path_datadir = join_paths(path_prefix, get_option('datadir'))
 path_sbindir = join_paths(path_prefix, get_option('sbindir'))
 path_vardir = join_paths(path_prefix, get_option('localstatedir'), 'cache', meson.project_name())
 
+# Grab systemd specifics
+message('Asking pkg-config for systemd\'s directories')
+dep_systemd = dependency('systemd')
+path_systemd_unit_dir = dep_systemd.get_pkgconfig_variable('systemdsystemunitdir')
 
 # Sort out config.h now
 cdata = configuration_data()
@@ -64,6 +68,7 @@ config_h_dir = include_directories('.')
 
 # Build the project
 subdir('src')
+subdir('data')
 
 report = [
     '    Build configuration:',
@@ -76,6 +81,7 @@ report = [
     '    sbindir:                                @0@'.format(path_sbindir),
     '    cache directory:                        @0@'.format(path_vardir),
     '    static binary:                          @0@'.format(with_static_binary),
+    '    systemd unit directory:                 @0@'.format(path_systemd_unit_dir),
 ]
 
 # Output some stuff to validate the build config
