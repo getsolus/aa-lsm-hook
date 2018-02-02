@@ -1,4 +1,5 @@
 hook_sources = [
+    'build.c',
     'clean.c',
     'hook.c',
     'util.c',

@@ -25,7 +25,10 @@ int main(int argc, char **argv)
                 return EXIT_FAILURE;
         }
 
-        /* TODO: Load */
+        /* Perform build */
+        if (!aa_hook_context_build_cache(&ctx)) {
+                return EXIT_FAILURE;
+        }
 
         /* Now clean */
         return aa_hook_context_clean_cache(&ctx) ? EXIT_SUCCESS : EXIT_FAILURE;
