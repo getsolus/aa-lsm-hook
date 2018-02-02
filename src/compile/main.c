@@ -13,12 +13,19 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "hook.h"
+#include "util.h"
 
-int main(int argc, char **argv)
+int main(__aa_unused__ int argc, __aa_unused__ char **argv)
 {
         AaHookContext ctx = { 0 };
+
+        if (geteuid() != 0) {
+                fputs("This program must be run as root\n", stderr);
+                return EXIT_FAILURE;
+        }
 
         /* Perform discovery */
         if (!aa_hook_context_init(&ctx)) {
