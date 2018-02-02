@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define __aa_unused__ __attribute__(unused))
+#define __aa_unused__ __attribute__((unused))
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
