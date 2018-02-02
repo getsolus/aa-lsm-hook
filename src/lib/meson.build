@@ -2,6 +2,7 @@ hook_sources = [
     'build.c',
     'clean.c',
     'hook.c',
+    'load.c',
     'util.c',
 ]
 
