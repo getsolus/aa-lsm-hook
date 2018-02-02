@@ -92,6 +92,11 @@ bool aa_hook_context_clean_cache(AaHookContext *self)
                         continue;
                 }
 
+                /* Don't wipe `.features` file. */
+                if (strcmp(ent->d_name, ".features") == 0) {
+                        continue;
+                }
+
                 /* Continue even if the wipe fails so we clean some stuff up */
                 if (unlinkat(fd, ent->d_name, 0) != 0) {
                         fprintf(stderr,
