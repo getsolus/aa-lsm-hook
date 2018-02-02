@@ -1,6 +1,7 @@
 hook_sources = [
     'clean.c',
     'hook.c',
+    'util.c',
 ]
 
 # Static utility library for the CLI entry points

@@ -31,6 +31,12 @@
 
 #define autofree(N) __attribute__((cleanup(_autofree_func_##N))) N
 
+/**
+ * Execute a command and return the exit code if possible.
+ * Non-zero exit status is considered an error.
+ */
+int aa_lsm_hook_exec_command(char **command);
+
 /*
  * Editor modelines  -  https://www.wireshark.org/tools/modelines.html
  *
