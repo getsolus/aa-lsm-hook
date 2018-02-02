@@ -9,6 +9,9 @@ executable(
     include_directories: [
         config_h_dir,
     ],
+    dependencies: [
+        link_hook_lib,
+    ],
     install: true,
     install_dir: path_sbindir,
 )

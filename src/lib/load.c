@@ -35,6 +35,8 @@ bool aa_hook_context_load_cache(AaHookContext *self)
                 NULL,                    /* Terminator */
         };
 
+        command[0] = (char *)self->parser_binary;
+
         if (stat(self->cache_dir, &st) != 0) {
                 if (errno == ENOENT) {
                         return true;

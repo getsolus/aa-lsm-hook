@@ -13,11 +13,42 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
-int main(int argc, char **argv)
+#include "hook.h"
+#include "util.h"
+
+int main(__aa_unused__ int argc, __aa_unused__ char **argv)
 {
-        fputs("Not yet implemented\n", stderr);
-        return EXIT_FAILURE;
+        AaHookContext ctx = { 0 };
+
+        if (geteuid() != 0) {
+                fputs("This program must be run as root\n", stderr);
+                return EXIT_FAILURE;
+        }
+
+        /* Perform discovery */
+        if (!aa_hook_context_init(&ctx)) {
+                return EXIT_FAILURE;
+        }
+
+        /* Perform load */
+        if (aa_hook_context_load_cache(&ctx)) {
+                return EXIT_SUCCESS;
+        }
+
+        fputs("Attempting recompilation of cache due to failed loading\n", stderr);
+
+        /* Try recompilation because it failed to load (abi change perhaps) */
+        if (!aa_hook_context_build_cache(&ctx)) {
+                fputs("Recompilation failed, aborting\n", stderr);
+                return EXIT_FAILURE;
+        }
+
+        fputs("Attempting load of recompiled cache\n", stderr);
+
+        /* At this point its all up to a second load. */
+        return aa_hook_context_load_cache(&ctx) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 /*
