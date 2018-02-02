@@ -41,14 +41,14 @@ static bool aa_hook_context_build_one(AaHookContext *self, const char *source_di
         char *command[] = {
                 NULL,    /* parser_binary path */
                 "-WQTL", /* Write cache, never load, never read cache, set cache location */
-                "--abort-on-error",      /* We need error codes */
                 (char *)self->cache_dir, /* Target cache */
                 NULL,                    /* Path to file being parsed */
+                "--abort-on-error",      /* We need error codes */
                 NULL,                    /* Terminator */
         };
 
         command[0] = (char *)self->parser_binary;
-        command[4] = path_buf;
+        command[3] = path_buf;
 
         if (aa_lsm_hook_exec_command(command) != 0) {
                 fprintf(stderr,
