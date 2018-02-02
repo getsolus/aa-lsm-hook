@@ -17,6 +17,20 @@
 
 #define aa_unlikely(x) __builtin_expect((!!x), 0)
 
+/**
+ * Taken out of libnica and various other Solus projects like usysconf
+ */
+#define DEF_AUTOFREE(N, C)                                                                         \
+        static inline void _autofree_func_##N(void *p)                                             \
+        {                                                                                          \
+                if (p && *(N **)p) {                                                               \
+                        C(*(N **)p);                                                               \
+                        (*(void **)p) = NULL;                                                      \
+                }                                                                                  \
+        }
+
+#define autofree(N) __attribute__((cleanup(_autofree_func_##N))) N
+
 /*
  * Editor modelines  -  https://www.wireshark.org/tools/modelines.html
  *
