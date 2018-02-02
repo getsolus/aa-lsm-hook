@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <limits.h>
 
 #include "hook.h"
 #include "util.h"
