@@ -40,9 +40,8 @@ static const char *apparmor_binaries[] = {
  * In future we intend to make this support stateless paths, pending work
  * upstream.
  */
-static const char *apparmor_directories[] = {
-        "/etc/apparmor.d",
-};
+static const char *apparmor_directories[] = { "/etc/apparmor.d",
+                                              "/var/lib/snapd/apparmor/profiles" };
 
 bool aa_hook_context_init(AaHookContext *self)
 {
