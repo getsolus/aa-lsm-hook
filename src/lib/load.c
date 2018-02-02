@@ -11,13 +11,13 @@
 
 #define _GNU_SOURCE
 
-#include "hook.h"
-#include "util.h"
-
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+
+#include "hook.h"
+#include "util.h"
 
 /**
  * Our job is very simple, attempt to load the cache directory

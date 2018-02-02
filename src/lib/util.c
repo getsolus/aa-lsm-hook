@@ -11,8 +11,6 @@
 
 #define _GNU_SOURCE
 
-#include "util.h"
-
 #include <errno.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -20,6 +18,8 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+#include "util.h"
 
 /**
  * Taken directly from our usysconf codebase

@@ -11,9 +11,6 @@
 
 #define _GNU_SOURCE
 
-#include "hook.h"
-#include "util.h"
-
 #include <dirent.h>
 #include <errno.h>
 #include <limits.h>
@@ -21,6 +18,9 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#include "hook.h"
+#include "util.h"
 
 DEF_AUTOFREE(DIR, closedir)
 

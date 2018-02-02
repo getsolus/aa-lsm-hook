@@ -11,15 +11,15 @@
 
 #define _GNU_SOURCE
 
-#include "hook.h"
-#include "config.h"
-#include "util.h"
-
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#include "config.h"
+#include "hook.h"
+#include "util.h"
 
 /**
  * Almost all distros will hit on the very first item, if they follow
