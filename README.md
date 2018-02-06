@@ -10,10 +10,28 @@ If the cache is invalid or unable to load, it will be recompiled, to ensure that
 
 ![logo](https://build.solus-project.com/logo.png)
 
+## What/Why even
 
-## WORK IN PROGRESS
+This project was created to provide a reusable AppArmor integration hook for any distribution that wants it. The issue in Solus was the use of legacy bash scripts to
+manage the lifetime of AppArmor profiles, and massive boot time regressions. With local testing and a working AoT cache we go from 1.3s to around 8ms load on my local
+test machine.
 
-This repo is currently work in progress. Check back later
+Note that this project isn't doing any "magic". Simply it provides well defined load and compile steps that wrap `apparmor_parser`, with some basic logic for garbage
+collection and ensuring invalidated caches don't cause failed boots. The focus is on management and boot time.
+
+## Integration
+
+The `aa-lsm-hook.service` systemd unit should be enabled instead of any provided `apparmor.service` style init. This will ensure our hook is run during early boot,
+which will load **only** from the binary cache. Note this requires that a binary cache is actually present, so be sure to compile it ahead of time.
+
+To integrate the compilation step, you'll need a hook in your package manager/update process to execute `aa-lsm-hook-compile` when the apparmor paths change on
+disk, i.e. `/etc/apparmor.d`.
+
+## Quirks
+
+Currently we have a special-case path to compile the `snapd` profiles from `/var/lib/snapd/apparmor/profiles` into the cache if they exist, which ensures the binary
+load step will work properly on boot. Without this quirk/workaround, the snapd AppArmor profiles wouldn't be loaded **until** `snapd` is directly started and causes
+broken snaps. With this .. quirk, everything works correctly, boot time is not regressed, and snaps work for those that have them.
 
 ## Authors
 
