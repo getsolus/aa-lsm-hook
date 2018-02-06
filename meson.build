@@ -1,7 +1,7 @@
 project(
     'aa-lsm-hook',
     ['c'],
-    version: '0.0.1',
+    version: '0.0.2',
     license: [
         'GPL-2.0',
     ],
