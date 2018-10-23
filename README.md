@@ -6,9 +6,9 @@
 
 If the cache is invalid or unable to load, it will be recompiled, to ensure that the boot time performance hit is very rare (i.e. kernel or parser ABI changed without cache recompilation using those ABIs).
 
-`aa-lsm-hook` is a [Solus project](https://solus-project.com/)
+`aa-lsm-hook` is a [Solus project](https://getsol.us/)
 
-![logo](https://build.solus-project.com/logo.png)
+![logo](https://build.getsol.us/logo.png)
 
 ## What/Why even
 
