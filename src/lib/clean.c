@@ -1,7 +1,7 @@
 /*
  * This file is part of aa-lsm-hook.
  *
- * Copyright © 2018 Solus Project
+ * Copyright © 2018-2019 Solus Project
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,18 +11,15 @@
 
 #define _GNU_SOURCE
 
-#include <dirent.h>
 #include <errno.h>
+#include <fts.h>
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
 #include "hook.h"
 #include "util.h"
-
-DEF_AUTOFREE(DIR, closedir)
 
 /**
  * Return true if we find the name within a source directory.
@@ -57,61 +54,42 @@ static bool aa_hook_context_has_cache(AaHookContext *self, const char *d_name)
  */
 bool aa_hook_context_clean_cache(AaHookContext *self)
 {
-        autofree(DIR) *dir = NULL;
-        struct dirent *ent = NULL;
-        bool ret = false;
-        int fd = 0;
+        FTSENT* curr_entry = NULL;
+        char* path[] = { self->cache_dir, NULL };
+        FTS* file_system = fts_open(path, FTS_PHYSICAL | FTS_NOSTAT, NULL);
 
-        if (aa_unlikely(!self)) {
+        if (file_system == NULL) {
                 return false;
         }
 
-        /* If the directory doesn't exist yet, it isn't fatal */
-        dir = opendir(self->cache_dir);
-        if (!dir) {
-                if (errno == ENOENT) {
-                        return true;
+        bool ret = true;
+        while ((curr_entry = fts_read(file_system)) != NULL && errno == 0) {
+                switch (curr_entry->fts_info) {
+                case FTS_F:
+                case FTS_NSOK:
+                        /* Ignore the .features file and profiles that are still installed */
+                        if (strcmp(curr_entry->fts_name, ".features") == 0 ||
+                            aa_hook_context_has_cache(self, curr_entry->fts_name)) {
+                                continue;
+                        }
+                case FTS_DP:
+                        /* Remove the file or the dir if it's empty */
+                        if (remove(curr_entry->fts_path) == 0) {
+                                /* Print for benefit of calling tool */
+                                fprintf(stdout,
+                                        "aa_hook_context_clean_cache(): Removed %s\n",
+                                        curr_entry->fts_name);
+                        } else if (errno != ENOTEMPTY) {
+                                /* It's OK if dir was not empty, but print other error cases */
+                                fprintf(stderr,
+                                        "Unable to remove() %s: %s\n",
+                                        curr_entry->fts_path,
+                                        strerror(errno));
+                                ret = false;
+                        }
                 }
-                return false;
         }
-
-        /* Assume success at this point */
-        fd = dirfd(dir);
-        ret = true;
-
-        while ((ent = readdir(dir)) != NULL) {
-                if (strlen(ent->d_name) == 1 && strcmp(ent->d_name, ".") == 0) {
-                        continue;
-                }
-
-                if (strlen(ent->d_name) == 2 && strcmp(ent->d_name, "..") == 0) {
-                        continue;
-                }
-
-                if (aa_hook_context_has_cache(self, ent->d_name)) {
-                        continue;
-                }
-
-                /* Don't wipe `.features` file. */
-                if (strcmp(ent->d_name, ".features") == 0) {
-                        continue;
-                }
-
-                /* Continue even if the wipe fails so we clean some stuff up */
-                if (unlinkat(fd, ent->d_name, 0) != 0) {
-                        fprintf(stderr,
-                                "Unable to unlink() %s/%s: %s\n",
-                                self->cache_dir,
-                                ent->d_name,
-                                strerror(errno));
-                        ret = false;
-                        continue;
-                }
-
-                /* Print for benefit of calling tool */
-                fprintf(stdout, "aa_hook_context_clean_cache(): Removed %s\n", ent->d_name);
-        }
-
+        fts_close(file_system);
         return ret;
 }
 
