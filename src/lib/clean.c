@@ -71,6 +71,17 @@ bool aa_hook_context_clean_cache(AaHookContext *self)
 
         while ((curr_entry = fts_read(file_system)) != NULL && errno == 0) {
                 unsigned short path_info = curr_entry->fts_info;
+
+                if (path_info == FTS_DNR || path_info == FTS_ERR || path_info == FTS_NS) {
+                        /* An error related to the file/dir occured. Signal it and move on */
+                        fprintf(stderr,
+                                "Unable to read %s: %s\n",
+                                curr_entry->fts_path,
+                                strerror(curr_entry->fts_errno));
+                        ret = false;
+                        continue;
+                }
+
                 if (path_info != FTS_F || path_info != FTS_NSOK || path_info != FTS_DP) {
                         continue;
                 }
@@ -95,6 +106,16 @@ bool aa_hook_context_clean_cache(AaHookContext *self)
                         "aa_hook_context_clean_cache(): Removed %s\n",
                         curr_entry->fts_name);
         }
+
+        if (errno != 0) {
+                /* A blocking error occured */
+                fprintf(stderr,
+                        "Fatal error while reading %s: %s\n",
+                        curr_entry->fts_path,
+                        strerror(errno));
+                ret = false;
+        }
+
         fts_close(file_system);
         return ret;
 }
