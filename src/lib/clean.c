@@ -54,32 +54,40 @@ static bool aa_hook_context_has_cache(AaHookContext *self, const char *d_name)
  */
 bool aa_hook_context_clean_cache(AaHookContext *self)
 {
-        FTSENT* curr_entry = NULL;
-        char* path[] = { self->cache_dir, NULL };
-        FTS* file_system = fts_open(path, FTS_PHYSICAL | FTS_NOSTAT, NULL);
+        bool ret = true;
+        FTSENT *curr_entry = NULL;
+        FTS *file_system = NULL;
+
+        if (aa_unlikely(!self)) {
+                return false;
+        }
+
+        char *path[] = { self->cache_dir, NULL };
+        file_system = fts_open(path, FTS_PHYSICAL | FTS_NOSTAT, NULL);
 
         if (file_system == NULL) {
                 return false;
         }
 
-        bool ret = true;
         while ((curr_entry = fts_read(file_system)) != NULL && errno == 0) {
-                switch (curr_entry->fts_info) {
-                case FTS_F:
-                case FTS_NSOK:
+                unsigned short path_info = curr_entry->fts_info;
+                if (path_info != FTS_F || path_info != FTS_NSOK || path_info != FTS_DP) {
+                        continue;
+                }
+                if (path_info != FTS_F || path_info != FTS_NSOK) {
                         /* Ignore the .features file and profiles that are still installed */
                         if (strcmp(curr_entry->fts_name, ".features") == 0 ||
                             aa_hook_context_has_cache(self, curr_entry->fts_name)) {
                                 continue;
                         }
-                case FTS_DP:
-                        /* Remove the file or the dir if it's empty */
-                        if (remove(curr_entry->fts_path) == 0) {
-                                /* Print for benefit of calling tool */
-                                fprintf(stdout,
-                                        "aa_hook_context_clean_cache(): Removed %s\n",
-                                        curr_entry->fts_name);
-                        } else if (errno != ENOTEMPTY) {
+                }
+                if (remove(curr_entry->fts_path) == 0) {
+                        /* Print for benefit of calling tool */
+                        fprintf(stdout,
+                                "aa_hook_context_clean_cache(): Removed %s\n",
+                                curr_entry->fts_name);
+                } else {
+                        if (errno != ENOTEMPTY) {
                                 /* It's OK if dir was not empty, but print other error cases */
                                 fprintf(stderr,
                                         "Unable to remove() %s: %s\n",
