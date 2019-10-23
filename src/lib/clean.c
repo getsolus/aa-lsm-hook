@@ -62,7 +62,7 @@ bool aa_hook_context_clean_cache(AaHookContext *self)
                 return false;
         }
 
-        char *path[] = { self->cache_dir, NULL };
+        char *path[] = { (char *)self->cache_dir, NULL };
         file_system = fts_open(path, FTS_PHYSICAL | FTS_NOSTAT, NULL);
 
         if (file_system == NULL) {
