@@ -1,9 +1,9 @@
 project(
     'aa-lsm-hook',
     ['c'],
-    version: '0.0.2',
+    version: '0.0.3',
     license: [
-        'GPL-2.0',
+        'GPL-2.0-or-later',
     ],
     default_options: [
         'c_std=c11',

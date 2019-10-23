@@ -10,31 +10,39 @@ If the cache is invalid or unable to load, it will be recompiled, to ensure that
 
 ![logo](https://build.getsol.us/logo.png)
 
-## What/Why even
+### What/Why even
 
-This project was created to provide a reusable AppArmor integration hook for any distribution that wants it. The issue in Solus was the use of legacy bash scripts to
-manage the lifetime of AppArmor profiles, and massive boot time regressions. With local testing and a working AoT cache we go from 1.3s to around 8ms load on my local
-test machine.
+This project was created to provide a reusable AppArmor integration hook for any distribution that wants it. The issue in Solus was the use of legacy bash scripts to manage the lifetime of AppArmor profiles, and massive boot time regressions. With local testing and a working AoT cache we go from 1.3s to around 8ms load on my local test machine.
 
-Note that this project isn't doing any "magic". Simply it provides well defined load and compile steps that wrap `apparmor_parser`, with some basic logic for garbage
-collection and ensuring invalidated caches don't cause failed boots. The focus is on management and boot time.
+Note that this project isn't doing any "magic". Simply it provides well defined load and compile steps that wrap `apparmor_parser`, with some basic logic for garbage collection and ensuring invalidated caches don't cause failed boots. The focus is on management and boot time.
 
-## Integration
+### Integration
 
-The `aa-lsm-hook.service` systemd unit should be enabled instead of any provided `apparmor.service` style init. This will ensure our hook is run during early boot,
-which will load **only** from the binary cache. Note this requires that a binary cache is actually present, so be sure to compile it ahead of time.
+The `aa-lsm-hook.service` systemd unit should be enabled instead of any provided `apparmor.service` style init. This will ensure our hook is run during early boot, which will load **only** from the binary cache. Note this requires that a binary cache is actually present, so be sure to compile it ahead of time.
 
-To integrate the compilation step, you'll need a hook in your package manager/update process to execute `aa-lsm-hook-compile` when the apparmor paths change on
-disk, i.e. `/etc/apparmor.d`.
+To integrate the compilation step, you'll need a hook in your package manager/update process to execute `aa-lsm-hook-compile` when the apparmor paths change on disk, i.e. `/etc/apparmor.d`.
 
-## Quirks
+### Quirks
 
-Currently we have a special-case path to compile the `snapd` profiles from `/var/lib/snapd/apparmor/profiles` into the cache if they exist, which ensures the binary
-load step will work properly on boot. Without this quirk/workaround, the snapd AppArmor profiles wouldn't be loaded **until** `snapd` is directly started and causes
-broken snaps. With this .. quirk, everything works correctly, boot time is not regressed, and snaps work for those that have them.
+Currently we have a special-case path to compile the `snapd` profiles from `/var/lib/snapd/apparmor/profiles` into the cache if they exist, which ensures the binary load step will work properly on boot. Without this quirk/workaround, the snapd AppArmor profiles wouldn't be loaded **until** `snapd` is directly started and causes broken snaps. With this .. quirk, everything works correctly, boot time is not regressed, and snaps work for those that have them.
+
+## Tagging Releases
+
+As this project leverages Meson, we utilize ninja dist for the generation of tarballs.
+
+1. All releases should be done against an existing new local git tag, with updates made to the meson.build and sign-tarball.sh files which indicate the release.
+2. As standard with ninja dist, you must first run meson to configure the build, then proceed to run ninja dist to generate the tarball.
+3. Run `sign-tarball.sh` to sign the tarball and generate an asc file.
+
+Example:
+
+```
+meson --prefix /usr --libdir /usr/lib64 --sysconfdir /etc -Dwith-static-binary=true build --buildtype plain
+ninja dist -C build
+```
 
 ## Authors
 
-Copyright © 2018 Solus Project
+Copyright © 2018-2019 Solus Project
 
-`aa-lsm-hook` is available under the terms of the `GPL-2.0` license.
+`aa-lsm-hook` is available under the terms of the `GPL-2.0-or-later` license.
