@@ -81,21 +81,19 @@ bool aa_hook_context_clean_cache(AaHookContext *self)
                                 continue;
                         }
                 }
-                if (remove(curr_entry->fts_path) == 0) {
-                        /* Print for benefit of calling tool */
-                        fprintf(stdout,
-                                "aa_hook_context_clean_cache(): Removed %s\n",
-                                curr_entry->fts_name);
-                } else {
-                        if (errno != ENOTEMPTY) {
-                                /* It's OK if dir was not empty, but print other error cases */
-                                fprintf(stderr,
-                                        "Unable to remove() %s: %s\n",
-                                        curr_entry->fts_path,
-                                        strerror(errno));
-                                ret = false;
-                        }
+                if (remove(curr_entry->fts_path) != 0 && errno != ENOTEMPTY) {
+                        /* It's OK if dir was not empty, but print other error cases */
+                        fprintf(stderr,
+                                "Unable to remove() %s: %s\n",
+                                curr_entry->fts_path,
+                                strerror(errno));
+                        ret = false;
+                        continue;
                 }
+                /* Removal succeedeed. Print it for benefit of calling tool */
+                fprintf(stdout,
+                        "aa_hook_context_clean_cache(): Removed %s\n",
+                        curr_entry->fts_name);
         }
         fts_close(file_system);
         return ret;
