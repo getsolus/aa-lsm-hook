@@ -74,7 +74,7 @@ bool aa_hook_context_clean_cache(AaHookContext *self)
                 if (path_info != FTS_F || path_info != FTS_NSOK || path_info != FTS_DP) {
                         continue;
                 }
-                if (path_info != FTS_F || path_info != FTS_NSOK) {
+                if (path_info == FTS_F || path_info == FTS_NSOK) {
                         /* Ignore the .features file and profiles that are still installed */
                         if (strcmp(curr_entry->fts_name, ".features") == 0 ||
                             aa_hook_context_has_cache(self, curr_entry->fts_name)) {
