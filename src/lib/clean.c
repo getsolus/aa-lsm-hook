@@ -82,7 +82,7 @@ bool aa_hook_context_clean_cache(AaHookContext *self)
                         continue;
                 }
 
-                if (path_info != FTS_F || path_info != FTS_NSOK || path_info != FTS_DP) {
+                if (path_info != FTS_F && path_info != FTS_NSOK && path_info != FTS_DP) {
                         continue;
                 }
                 if (path_info == FTS_F || path_info == FTS_NSOK) {
