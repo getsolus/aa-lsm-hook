@@ -6,7 +6,7 @@ Before=sysinit.target
 
 [Service]
 Type=oneshot
-ExecStart=@SBINDIR@/aa-lsm-hook-load
+ExecStart=/usr/sbin/aa-lsm-hook
 
 [Install]
 WantedBy=multi-user.target

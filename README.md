@@ -1,6 +1,6 @@
 # aa-lsm-hook
 
-[![License](https://img.shields.io/badge/License-GPL%202.0-blue.svg)](https://opensource.org/licenses/GPL-2.0)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 `aa-lsm-hook` is a simple project to provide distro integration points for the AppArmor LSM. The core goal is to simplify said integration by means of simple binaries that can be called on boot and during package transactions when the apparmor profiles reload. The net result is ahead-of-time compilation for AppArmor profiles (using `apparmor_parser`) and avoiding boot time regressions by loading only from a cache.
 
@@ -20,29 +20,24 @@ Note that this project isn't doing any "magic". Simply it provides well defined 
 
 The `aa-lsm-hook.service` systemd unit should be enabled instead of any provided `apparmor.service` style init. This will ensure our hook is run during early boot, which will load **only** from the binary cache. Note this requires that a binary cache is actually present, so be sure to compile it ahead of time.
 
-To integrate the compilation step, you'll need a hook in your package manager/update process to execute `aa-lsm-hook-compile` when the apparmor paths change on disk, i.e. `/etc/apparmor.d`.
+To integrate the compilation step, you'll need a hook in your package manager/update process to execute `aa-lsm-hook` when the apparmor paths change on disk, i.e. `/etc/apparmor.d`.
 
 ### Quirks
 
 Currently we have a special-case path to compile the `snapd` profiles from `/var/lib/snapd/apparmor/profiles` into the cache if they exist, which ensures the binary load step will work properly on boot. Without this quirk/workaround, the snapd AppArmor profiles wouldn't be loaded **until** `snapd` is directly started and causes broken snaps. With this .. quirk, everything works correctly, boot time is not regressed, and snaps work for those that have them.
 
-## Tagging Releases
-
-As this project leverages Meson, we utilize ninja dist for the generation of tarballs.
-
-1. All releases should be done against an existing new local git tag, with updates made to the meson.build and sign-tarball.sh files which indicate the release.
-2. As standard with ninja dist, you must first run meson to configure the build, then proceed to run ninja dist to generate the tarball.
-3. Run `sign-tarball.sh` to sign the tarball and generate an asc file.
-
-Example:
-
-```
-meson --prefix /usr --libdir /usr/lib64 --sysconfdir /etc -Dwith-static-binary=true build --buildtype plain
-ninja dist -C build
-```
-
 ## Authors
 
-Copyright © 2018-2019 Solus Project
+Copyright © 2018-2019 Solus Project <copyright@getsol.us>
 
-`aa-lsm-hook` is available under the terms of the `GPL-2.0-or-later` license.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
