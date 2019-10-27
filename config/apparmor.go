@@ -17,4 +17,4 @@
 package config
 
 // AppArmorCache is the location of the AppArmor cache that we are managing
-const AppArmorCache = "/etc/apparmor.d/cache"
+const AppArmorCache = "/var/cache/apparmor"
