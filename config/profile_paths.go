@@ -18,6 +18,7 @@ package config
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
 )
@@ -34,7 +35,7 @@ func ProfileDirs() ([]string, error) {
 
 	for _, file := range ConfigFiles { // For each file
 		if _, err := os.Stat(file); !os.IsNotExist(err) { // If the file exists
-			f, err := os.Open(file)// Open the File
+			f, err := os.Open(file) // Open the File
 			if err != nil {
 				return dirs, err
 			}
@@ -61,6 +62,9 @@ func ProfileDirs() ([]string, error) {
 			// Close files
 			_ = f.Close()
 		}
+	}
+	if len(dirs) == 0 { // check for no configured profile paths
+		return dirs, fmt.Errorf("failed to find any configured profile paths")
 	}
 	// return all found directories
 	return dirs, nil

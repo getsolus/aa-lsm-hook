@@ -54,7 +54,7 @@ func (m ProfMap) UpdatePath(dir string, cache ProfMap) error {
 
 		e := Entry{ // Create a new Entry
 			Mod:  f.ModTime(), // Add the mod time of the file
-			Path: dir, // Add the directory path
+			Path: dir,         // Add the directory path
 		}
 
 		name := f.Name()
