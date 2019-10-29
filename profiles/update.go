@@ -28,7 +28,7 @@ import (
 // Update regenerates an entry in the AppArmor cache on disk
 func Update(path string) error {
 	cmd := exec.Command("apparmor_parser",
-		"-WQTL", // Replace all rules, reaf binary input
+		"-WQTL", // Replace all rules, read binary input
 		config.AppArmorCache,
 		path,
 		"--abort-on-error")
@@ -42,36 +42,36 @@ func Update(path string) error {
 
 // UpdatePath updates all of the profiles in a directory if their cache is older than the profile or doesn't exist
 func (m ProfMap) UpdatePath(dir string, cache ProfMap) error {
-	// get all the files in the cache
-	fs, err := ioutil.ReadDir(dir)
+	fs, err := ioutil.ReadDir(dir) // get all the files in the cache
 	if err != nil {
 		return err
 	}
-	// for each file
-	for _, f := range fs {
-		// skip if its a directory
-		if f.IsDir() {
+
+	for _, f := range fs { // for each file
+		if f.IsDir() { // skip if its a directory
 			continue
 		}
-		// track that it was processed
-		e := Entry{
-			Name: dir,
-			Mod:  f.ModTime(),
+
+		e := Entry{ // Create a new Entry
+			Mod:  f.ModTime(), // Add the mod time of the file
+			Path: dir, // Add the directory path
 		}
-		m[f.Name()] = append(m[f.Name()], e)
+
+		name := f.Name()
+		m[name] = append(m[name], e) // Add to our ProfMap
+
 		// check if update is needed
 		update := true
-		if entries := cache[f.Name()]; len(entries) > 0 {
+		if entries := cache[name]; len(entries) > 0 {
 			for _, cached := range entries {
 				if !cached.Mod.Before(e.Mod) {
 					update = false
 				}
 			}
 		}
-		// update as needed
+
 		if update {
-			err = Update(filepath.Join(dir, f.Name()))
-			if err != nil {
+			if err = Update(filepath.Join(dir, name)); err != nil {
 				return err
 			}
 		}
@@ -82,8 +82,7 @@ func (m ProfMap) UpdatePath(dir string, cache ProfMap) error {
 // UpdateAll calls UpdatePath for all profile directories that were configured
 func UpdateAll(dirs []string, cached ProfMap) (ProfMap, error) {
 	profs := make(ProfMap)
-	// update every directory, one by one
-	for _, dir := range dirs {
+	for _, dir := range dirs { // update every directory, one by one
 		if err := profs.UpdatePath(dir, cached); err != nil {
 			return profs, err
 		}

@@ -17,9 +17,11 @@
 package cache
 
 import (
+	"fmt"
 	"github.com/getsolus/aa-lsm-hook/profiles"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 // FindNewest gets the newest entry in the list of entries
@@ -40,10 +42,10 @@ func FindNewest(entries []profiles.Entry) profiles.Entry {
 
 // DeleteAll removes all of the cache entries for this profile
 func DeleteAll(name string, entries []profiles.Entry) error {
-	//fmt.Printf("Delete All of: %s\n", name)
+	fmt.Printf("Delete All of: %s\n", name)
 	for _, e := range entries {
-		//fmt.Printf(" - %s\n", filepath.Join(e.Name, name))
-		if err := os.Remove(filepath.Join(e.Name, name)); err != nil {
+		fmt.Printf(" - %s\n", filepath.Join(e.Path, name))
+		if err := os.Remove(filepath.Join(e.Path, name)); err != nil {
 			return err
 		}
 	}
@@ -52,11 +54,11 @@ func DeleteAll(name string, entries []profiles.Entry) error {
 
 // DeleteOlder removes all but the most recent cache entries for this profile
 func DeleteOlder(name string, newest profiles.Entry, entries []profiles.Entry) error {
-	//fmt.Printf("Delete Older Than %s: %s\n", name, newest.Mod.Format(time.RFC3339))
+	fmt.Printf("Delete Older Than %s: %s\n", name, newest.Mod.Format(time.RFC3339))
 	for _, e := range entries {
 		if e.Mod.Before(newest.Mod) {
-			//fmt.Printf(" - %s: %s\n", filepath.Join(e.Name, name), e.Mod.Format(time.RFC3339))
-			if err := os.Remove(filepath.Join(e.Name, name)); err != nil {
+			fmt.Printf(" - %s: %s\n", filepath.Join(e.Path, name), e.Mod.Format(time.RFC3339))
+			if err := os.Remove(filepath.Join(e.Path, name)); err != nil {
 				return err
 			}
 		}
@@ -66,23 +68,17 @@ func DeleteOlder(name string, newest profiles.Entry, entries []profiles.Entry) e
 
 // Clean removes unnecessary cache entries for various profiles
 func Clean(profs, cached profiles.ProfMap) error {
-	// Scan for latest cached profiles
-	cached, err := Scan()
-	if err != nil {
-		return err
-	}
-	// For every entry in the cache
-	for name, entries := range cached {
+	for name, entries := range cached { // For every entry in the cache
 		// Remove all if the profiles don't exist anymore
 		if len(profs[name]) == 0 {
-			if err = DeleteAll(name, entries); err != nil {
+			if err := DeleteAll(name, entries); err != nil {
 				return err
 			}
 			continue
 		}
 		// Remove all but the entries for the newest profile
 		newest := FindNewest(profs[name])
-		if err = DeleteOlder(name, newest, entries); err != nil {
+		if err := DeleteOlder(name, newest, entries); err != nil {
 			return err
 		}
 	}

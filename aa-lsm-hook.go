@@ -25,27 +25,29 @@ import (
 
 func main() {
 	// Get the current user
-	u, err := user.Current()
+	var u *user.User
+	var err error
+
+	if u, err = user.Current(); err == nil { // Got our user
+		if u.Uid != "0" || u.Gid != "0" { // Not running as root
+			err = fmt.Errorf("You must be root to run this program")
+		}
+	}
+
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	// Make sure we are running as root (sudo)
-	if u.Uid != "0" || u.Gid != "0" {
-		fmt.Println("You must be root to run this program")
-		os.Exit(1)
-	}
-	// Update the caches on disk
-	err = cache.Update()
-	if err != nil {
+
+	if err = cache.Update(); err != nil { // Update cache on disk
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	// Reload the kernel cache
-	err = cache.Load()
-	if err != nil {
+
+	if err = cache.Load(); err != nil { // Reload the cache
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
+
 	os.Exit(0)
 }

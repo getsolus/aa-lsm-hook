@@ -24,10 +24,11 @@ import (
 
 // Entry is an item in a ProfMap representing a profile
 type Entry struct {
-	// Name is the location where this profile is stored on disk
-	Name string
 	// Mod is the last time the profile was modified
 	Mod time.Time
+
+	// Path is the location where this profile is stored on disk
+	Path string
 }
 
 // ProfMap relates multiple profiles of the same name to their different locations
@@ -42,24 +43,25 @@ func (m ProfMap) AddProfiles(dir string) error {
 	}
 	// for each file
 	for _, f := range fs {
+		name := f.Name()
 		// skip feature files
-		if f.Name() == ".features" {
+		if name == ".features" {
 			continue
 		}
 		// traverse to the next level
 		if f.IsDir() {
-			err = m.AddProfiles(filepath.Join(dir, f.Name()))
-			if err != nil {
+			if err = m.AddProfiles(filepath.Join(dir, name)); err != nil {
 				return err
 			}
+
 			continue
 		}
 		// store an entry for this file
 		e := Entry{
-			Name: dir,
 			Mod:  f.ModTime(),
+			Path: dir,
 		}
-		m[f.Name()] = append(m[f.Name()], e)
+		m[name] = append(m[name], e)
 	}
 	return nil
 }

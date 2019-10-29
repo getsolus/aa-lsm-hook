@@ -31,12 +31,10 @@ var ConfigFiles = []string{
 // ProfileDirs retriesves a list of directories to search for profiles, listed one per line in each of the ConfigFiles
 func ProfileDirs() ([]string, error) {
 	dirs := make([]string, 0)
-	// For each file
-	for _, file := range ConfigFiles {
-		// Check that the file exists
-		if _, err := os.Stat(file); !os.IsNotExist(err) {
-			// Open the File
-			f, err := os.Open(file)
+
+	for _, file := range ConfigFiles { // For each file
+		if _, err := os.Stat(file); !os.IsNotExist(err) { // If the file exists
+			f, err := os.Open(file)// Open the File
 			if err != nil {
 				return dirs, err
 			}
@@ -47,9 +45,8 @@ func ProfileDirs() ([]string, error) {
 				// skip check for empty lines
 				if len(raw) > 0 {
 					path := string(raw)
-					// Add to list if the directory exists
 					if _, e := os.Stat(path); !os.IsNotExist(e) {
-						dirs = append(dirs, path)
+						dirs = append(dirs, path) // Add to list if the directory exists
 					}
 				}
 				// Check for I/O error or last line

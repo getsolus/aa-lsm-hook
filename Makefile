@@ -54,7 +54,7 @@ setup-deps:
 
 install:
 	@$(call stage,INSTALL)
-	install -D -m 00755 $(PKGNAME) $(DESTDIR)$(BINDIR)/$(PKGNAME)
+	install -Dm 00755 $(PKGNAME) $(DESTDIR)$(BINDIR)/$(PKGNAME)
 	@$(call pass,INSTALL)
 
 uninstall:

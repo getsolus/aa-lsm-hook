@@ -23,23 +23,25 @@ import (
 
 // Update rebuilds all of the profiles in the cache and cleans up the cache
 func Update() error {
-	// Get the profile directories
-	dirs, err := config.ProfileDirs()
+	dirs, err := config.ProfileDirs() // Get the profile directories
 	if err != nil {
 		return err
 	}
-	// Scan cached profiles
-	cached, err := Scan()
+
+	cached, err := Scan() // Scan cached profiles
 	if err != nil {
 		return err
 	}
-	// Cache all profiles as needed
+
 	profs, err := profiles.UpdateAll(dirs, cached)
-	// Rescan cached profiles
-	cached, err = Scan()
-	if err != nil {
+
+	if err != nil { // Cache all profiles as needed
 		return err
 	}
-	// Clean up orphaned cached profiles
-	return Clean(profs, cached)
+
+	if cached, err = Scan(); err != nil { // Attempt to rescan cached profiles
+		return err
+	}
+
+	return Clean(profs, cached) // Clean up orphaned cached profiles
 }
