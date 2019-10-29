@@ -2,6 +2,8 @@ PKGNAME  = aa-lsm-hook
 DESTDIR ?=
 PREFIX  ?= /usr
 BINDIR   = $(PREFIX)/sbin
+LIBDIR ?= $(PREFIX)/lib
+SYSCONFDIR ?= /etc
 
 GOPROJROOT  = $(GOSRC)/$(PROJREPO)
 
@@ -55,6 +57,8 @@ setup-deps:
 install:
 	@$(call stage,INSTALL)
 	install -Dm 00755 $(PKGNAME) $(DESTDIR)$(BINDIR)/$(PKGNAME)
+	install -Dm 00755 data/aa-lsm-hook.conf $(DESTDIR)$(SYSCONFDIR)/aa-lsm-hook.conf
+	install -Dm 00755 data/aa-lsm-hook.service $(DESTDIR)$(LIBDIR)/systemd/system/aa-lsm-hook.service
 	@$(call pass,INSTALL)
 
 uninstall:
