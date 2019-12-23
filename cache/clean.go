@@ -74,11 +74,13 @@ func Clean(profs, cached profiles.ProfMap) error {
 			}
 			continue
 		}
+        /*
 		// Remove all but the entries for the newest profile
 		newest := FindNewest(profs[name])
 		if err := DeleteOlder(name, newest, entries); err != nil {
 			return err
 		}
+        */
 	}
 	return nil
 }
