@@ -19,23 +19,23 @@ package cache
 import (
 	"fmt"
 	"github.com/getsolus/aa-lsm-hook/config"
-    "io/ioutil"
+	"io/ioutil"
 	"os"
 	"os/exec"
-    "path/filepath"
+	"path/filepath"
 )
 
 func loadDir(path string) error {
 	cmd := exec.Command("apparmor_parser",
-        "--abort-on-error",
-    	"-rB", // Replace all rules, read binary input
+		"--abort-on-error",
+		"-rB", // Replace all rules, read binary input
 		path)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("failed to load AppArmor definitions, reason: %s", err.Error())
 	}
-    return nil
+	return nil
 }
 
 // Load reloads the AppArmor cache into the kernel module
@@ -43,21 +43,21 @@ func Load() error {
 	if _, err := os.Stat(config.AppArmorCache); os.IsNotExist(err) {
 		return err
 	}
-    files, err := ioutil.ReadDir(config.AppArmorCache)
-    if err != nil {
-        return err
-    }
-    err = loadDir(config.AppArmorCache)
-    if err != nil {
-        return err
-    }
-    for _, file := range files {
-        if file.IsDir() {
-            err = loadDir(filepath.Join(config.AppArmorCache, file.Name()))
-            if err != nil {
-                return err
-            }
-        }
-    }
+	files, err := ioutil.ReadDir(config.AppArmorCache)
+	if err != nil {
+		return err
+	}
+	err = loadDir(config.AppArmorCache)
+	if err != nil {
+		return err
+	}
+	for _, file := range files {
+		if file.IsDir() {
+			err = loadDir(filepath.Join(config.AppArmorCache, file.Name()))
+			if err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }

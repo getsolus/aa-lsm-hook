@@ -18,6 +18,7 @@ package profiles
 
 import (
 	"fmt"
+	"github.com/getsolus/aa-lsm-hook/config"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -27,8 +28,10 @@ import (
 // Update regenerates an entry in the AppArmor cache on disk
 func Update(path string) error {
 	cmd := exec.Command("apparmor_parser",
-		path,
-		"--abort-on-error")
+		"--abort-on-error",
+		"-WQTL",
+		config.AppArmorCache,
+		path)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {

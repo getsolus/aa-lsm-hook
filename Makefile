@@ -3,7 +3,7 @@ DESTDIR ?=
 PREFIX  ?= /usr
 BINDIR   = $(PREFIX)/sbin
 LIBDIR ?= $(PREFIX)/lib
-SYSCONFDIR ?= /etc
+SYSCONFDIR ?= /usr/share/defaults/etc
 
 GOPROJROOT  = $(GOSRC)/$(PROJREPO)
 
