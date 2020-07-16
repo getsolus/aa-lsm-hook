@@ -2,7 +2,6 @@
 Description=Load AppArmor profiles
 DefaultDependencies=no
 After=local-fs.target snapd.service
-Before=sysinit.target
 
 [Service]
 Type=oneshot

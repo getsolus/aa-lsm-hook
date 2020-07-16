@@ -1,5 +1,11 @@
 # Changelog:
 ___
+**Version 0.1.1**
+
+ - Remove systemd Unit dependency cycle caused by sysinit
+ - Fix installation permissions for config files
+
+___
 **Version 0.1.0**
 
  - Full rewrite in Go for maintainability
