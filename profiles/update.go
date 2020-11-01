@@ -1,5 +1,5 @@
 //
-// Copyright 2018-2019 Solus Project <copyright@getsol.us>
+// Copyright 2018-2020 Solus Project <copyright@getsol.us>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,30 +46,26 @@ func (m ProfMap) UpdatePath(dir string, cache ProfMap) error {
 	if err != nil {
 		return err
 	}
-
 	for _, f := range fs { // for each file
 		if f.IsDir() { // skip if its a directory
 			continue
 		}
-
 		e := Entry{ // Create a new Entry
-			Mod:  f.ModTime(), // Add the mod time of the file
-			Path: dir,         // Add the directory path
+			Mod:  f.ModTime(),
+			Path: dir,
 		}
-
 		name := f.Name()
 		m[name] = append(m[name], e) // Add to our ProfMap
-
 		// check if update is needed
 		update := true
 		if entries := cache[name]; len(entries) > 0 {
 			for _, cached := range entries {
 				if !cached.Mod.Before(e.Mod) {
 					update = false
+					break
 				}
 			}
 		}
-
 		if update {
 			if err = Update(filepath.Join(dir, name)); err != nil {
 				return err

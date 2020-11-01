@@ -1,5 +1,5 @@
 //
-// Copyright 2018-2019 Solus Project <copyright@getsol.us>
+// Copyright 2018-2020 Solus Project <copyright@getsol.us>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,21 +27,16 @@ func Update() error {
 	if err != nil {
 		return err
 	}
-
 	cached, err := Scan() // Scan cached profiles
 	if err != nil {
 		return err
 	}
-
-	profs, err := profiles.UpdateAll(dirs, cached)
-
-	if err != nil { // Cache all profiles as needed
+	profs, err := profiles.UpdateAll(dirs, cached) // Cache all profiles as needed
+	if err != nil {
 		return err
 	}
-
 	if cached, err = Scan(); err != nil { // Attempt to rescan cached profiles
 		return err
 	}
-
 	return Clean(profs, cached) // Clean up orphaned cached profiles
 }

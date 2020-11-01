@@ -1,5 +1,5 @@
 //
-// Copyright 2018-2019 Solus Project <copyright@getsol.us>
+// Copyright 2018-2020 Solus Project <copyright@getsol.us>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package config
 
 import (
 	"bufio"
-	"fmt"
+	"errors"
 	"io"
 	"os"
 )
@@ -29,43 +29,61 @@ var ConfigFiles = []string{
 	"/etc/aa-lsm-hook.conf",
 }
 
-// ProfileDirs retriesves a list of directories to search for profiles, listed one per line in each of the ConfigFiles
-func ProfileDirs() ([]string, error) {
-	dirs := make([]string, 0)
-
-	for _, file := range ConfigFiles { // For each file
-		if _, err := os.Stat(file); !os.IsNotExist(err) { // If the file exists
-			f, err := os.Open(file) // Open the File
-			if err != nil {
-				return dirs, err
-			}
-			r := bufio.NewReader(f)
-			// Read each line
-			for {
-				raw, _, err := r.ReadLine()
-				// skip check for empty lines
-				if len(raw) > 0 {
-					path := string(raw)
-					if _, e := os.Stat(path); !os.IsNotExist(e) {
-						dirs = append(dirs, path) // Add to list if the directory exists
-					}
-				}
-				// Check for I/O error or last line
-				if err != nil {
-					if err != io.EOF {
-						_ = f.Close()
-						return dirs, err
-					}
-					break
-				}
-			}
-			// Close files
-			_ = f.Close()
+func parseConfigFile(name string) (dirs []string, err error) {
+	_, e := os.Stat(name)
+	if e != nil {
+		if os.IsNotExist(e) { // skip missing files
+			return
+		}
+		err = e
+		return
+	}
+	f, err := os.Open(name) // Open the File
+	if err != nil {
+		return
+	}
+	r := bufio.NewReader(f)
+	// Read each line
+	var raw []byte
+	for {
+		raw, _, err = r.ReadLine()
+		// Check for I/O error or last line
+		if err != nil {
+			break
+		}
+		// skip check for empty lines
+		if len(raw) == 0 {
+			continue
+		}
+		path := string(raw)
+		if _, e := os.Stat(path); e == nil {
+			dirs = append(dirs, path) // Add to list if the directory exists
 		}
 	}
-	if len(dirs) == 0 { // check for no configured profile paths
-		return dirs, fmt.Errorf("failed to find any configured profile paths")
+	if err == io.EOF {
+		err = nil
 	}
-	// return all found directories
-	return dirs, nil
+	// Close files
+	_ = f.Close()
+	return
+}
+
+// ErrNoProfileDirs is returned if no profile dirs have been configured
+var ErrNoProfileDirs = errors.New("failed to find any configured profile paths")
+
+// ProfileDirs retrieves a list of directories to search for profiles, listed one per line in each of the ConfigFiles
+func ProfileDirs() (dirs []string, err error) {
+	var newDirs []string
+	for _, file := range ConfigFiles {
+		newDirs, err = parseConfigFile(file)
+		if err != nil {
+			return
+		}
+		dirs = append(dirs, newDirs...)
+	}
+	if len(dirs) == 0 {
+		err = ErrNoProfileDirs
+		return
+	}
+	return
 }

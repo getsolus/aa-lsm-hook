@@ -1,5 +1,5 @@
 //
-// Copyright 2018-2019 Solus Project <copyright@getsol.us>
+// Copyright 2018-2020 Solus Project <copyright@getsol.us>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,16 +47,15 @@ func Load() error {
 	if err != nil {
 		return err
 	}
-	err = loadDir(config.AppArmorCache)
-	if err != nil {
+	if err = loadDir(config.AppArmorCache); err != nil {
 		return err
 	}
 	for _, file := range files {
-		if file.IsDir() {
-			err = loadDir(filepath.Join(config.AppArmorCache, file.Name()))
-			if err != nil {
-				return err
-			}
+		if !file.IsDir() {
+			continue
+		}
+		if err = loadDir(filepath.Join(config.AppArmorCache, file.Name())); err != nil {
+			return err
 		}
 	}
 	return nil

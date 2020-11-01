@@ -1,5 +1,5 @@
 //
-// Copyright 2018-2019 Solus Project <copyright@getsol.us>
+// Copyright 2018-2020 Solus Project <copyright@getsol.us>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import (
 type Entry struct {
 	// Mod is the last time the profile was modified
 	Mod time.Time
-
 	// Path is the location where this profile is stored on disk
 	Path string
 }
@@ -53,8 +52,7 @@ func (m ProfMap) AddProfiles(dir string) error {
 			if err = m.AddProfiles(filepath.Join(dir, name)); err != nil {
 				return err
 			}
-
-			continue
+			continue // don't add an entry for the directory itself
 		}
 		// store an entry for this file
 		e := Entry{
