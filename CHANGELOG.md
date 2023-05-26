@@ -1,5 +1,12 @@
 # Changelog:
 ___
+**Version 0.1.5**
+
+ - Clean up old non-managed cache directories
+ - Create cache directory when it does not exist
+ - Print error when not running as root
+
+___
 **Version 0.1.4**
 
  - Remove systemd Unit dependency cycle caused by sysinit
