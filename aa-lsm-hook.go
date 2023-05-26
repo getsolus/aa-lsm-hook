@@ -31,7 +31,7 @@ func main() {
 		os.Exit(1)
 	}
 	if u.Uid != "0" || u.Gid != "0" { // Not running as root
-		err = fmt.Errorf("You must be root to run this program")
+		fmt.Println("You must be root to run this program")
 		os.Exit(1)
 	}
 	if err = cache.Update(); err != nil { // Update cache on disk
