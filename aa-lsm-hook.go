@@ -34,6 +34,10 @@ func main() {
 		fmt.Println("You must be root to run this program")
 		os.Exit(1)
 	}
+	if err = cache.Init(); err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 	if err = cache.Update(); err != nil { // Update cache on disk
 		fmt.Println(err.Error())
 		os.Exit(1)
