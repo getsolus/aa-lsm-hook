@@ -17,13 +17,30 @@
 package cache
 
 import (
+	"bytes"
 	"fmt"
-	"github.com/getsolus/aa-lsm-hook/config"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
+
+	"github.com/getsolus/aa-lsm-hook/config"
 )
+
+// CurrentDir returns the path of the current cache directory.
+func CurrentDir() (string, error) {
+	out := &bytes.Buffer{}
+
+	cmd := exec.Command("apparmor_parser", "--print-cache-dir")
+	cmd.Stdout = out
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("failed to get current cache directory: %w", err)
+	}
+
+	return strings.TrimSpace(out.String()), nil
+}
 
 func loadDir(path string) error {
 	cmd := exec.Command("apparmor_parser",

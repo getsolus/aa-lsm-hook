@@ -17,9 +17,11 @@
 package cache
 
 import (
-	"github.com/getsolus/aa-lsm-hook/profiles"
+	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/getsolus/aa-lsm-hook/profiles"
 )
 
 // FindNewest gets the newest entry in the list of entries
@@ -70,13 +72,30 @@ func Clean(profs, cached profiles.ProfMap) error {
 			}
 			continue
 		}
-		/* TODO: Why is this here?
-		// Remove all but the entries for the newest profile
-		newest := FindNewest(profs[name])
-		if err := DeleteOlder(name, newest, entries); err != nil {
-			return err
-		}
-		*/
 	}
+
+	return nil
+}
+
+// CleanDirs cleans outdated directories
+func CleanDirs() error {
+	curDir, err := CurrentDir()
+	if err != nil {
+		return err
+	}
+
+	paths, err := ScanDirs()
+	if err != nil {
+		return err
+	}
+
+	for _, path := range paths {
+		if path != curDir {
+			if err = os.RemoveAll(path); err != nil {
+				return fmt.Errorf("failed to remove old cache directory: %w", err)
+			}
+		}
+	}
+
 	return nil
 }
