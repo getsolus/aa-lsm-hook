@@ -18,3 +18,6 @@ package config
 
 // AppArmorCache is the location of the AppArmor cache that we are managing
 const AppArmorCache = "/var/cache/apparmor"
+
+// AppArmorCachePermissions are the permission of the AppArmor cache when being created.
+const AppArmorCachePermissions = 0700
