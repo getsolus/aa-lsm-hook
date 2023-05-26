@@ -17,6 +17,9 @@
 package cache
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/getsolus/aa-lsm-hook/config"
 	"github.com/getsolus/aa-lsm-hook/profiles"
 )
@@ -26,4 +29,21 @@ func Scan() (profiles.ProfMap, error) {
 	profs := make(profiles.ProfMap)
 	err := profs.AddProfiles(config.AppArmorCache)
 	return profs, err
+}
+
+// ScanDirs returns all the currently cached directories.
+func ScanDirs() ([]string, error) {
+	entries, err := os.ReadDir(config.AppArmorCache)
+	if err != nil {
+		return nil, err
+	}
+
+	dirs := make([]string, 0, len(entries))
+	for _, entry := range entries {
+		if entry.IsDir() {
+			dirs = append(dirs, filepath.Join(config.AppArmorCache, entry.Name()))
+		}
+	}
+
+	return dirs, nil
 }

@@ -23,6 +23,9 @@ import (
 
 // Update rebuilds all of the profiles in the cache and cleans up the cache
 func Update() error {
+	if err := CleanDirs(); err != nil {
+		return err
+	}
 	dirs, err := config.ProfileDirs() // Get the profile directories
 	if err != nil {
 		return err
