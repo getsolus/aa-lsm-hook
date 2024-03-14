@@ -22,10 +22,6 @@ The `aa-lsm-hook.service` systemd unit should be enabled instead of any provided
 
 To integrate the compilation step, you'll need a hook in your package manager/update process to execute `aa-lsm-hook` when the apparmor paths change on disk, i.e. `/etc/apparmor.d`.
 
-### Quirks
-
-Currently we have a special-case path to compile the `snapd` profiles from `/var/lib/snapd/apparmor/profiles` into the cache if they exist, which ensures the binary load step will work properly on boot. Without this quirk/workaround, the snapd AppArmor profiles wouldn't be loaded **until** `snapd` is directly started and causes broken snaps. With this .. quirk, everything works correctly, boot time is not regressed, and snaps work for those that have them.
-
 ## Authors
 
 Copyright © 2018-2020 Solus Project <copyright@getsol.us>
